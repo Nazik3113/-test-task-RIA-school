@@ -1,3 +1,4 @@
+const { group } = require('console')
 const { Transform } = require('stream')
 
 class transform extends Transform {
@@ -20,19 +21,19 @@ class transform extends Transform {
         indexArr = 0
       } else {
         if (indexArr === 0) {
-          groups.set(arr[0].trim() + ':', `${arr[0]}: ${arr[1].trim()} \n`)
+          groups.set(arr[0].trim(), `${arr[0]}: ${arr[1].trim()} \n`)
           indexArr++
         } else {
           let count = 0
 
           for (let i = 0; i < arr.length; i++) {
             if (arr.length === 2) {
-              groups.set(arr[0].trim() + ':', `${arr[0]}: ${arr[1].trim()} \n`)
+              groups.set(arr[0].trim(), `${arr[0]}: ${arr[1].trim()} \n`)
             }
-            if (groups.get(`${arr[i]}:`) && indexArr !== 0 && count === 0) {
+            if (arr.length > 2 && indexArr !== 0 && count === 0) {
               groups.set(
-                arr[i] + ':',
-                `${groups.get(`${arr[i]}:`)}${' '.repeat(
+                arr[arr.length - 2],
+                `${groups.get(arr[arr.length - 2])}${' '.repeat(
                   (arr.length - 1) * 2 - 2
                 )}|- ${arr[0].trim()}: ${arr[arr.length - 1].trim()} \n`
               )
@@ -50,6 +51,7 @@ class transform extends Transform {
     for (var value of groups.values()) {
       string += value
     }
+    console.log(groups);
 
     this.push(string)
     done()
