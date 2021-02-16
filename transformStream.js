@@ -1,4 +1,3 @@
-const { group } = require('console')
 const { Transform } = require('stream')
 
 class transform extends Transform {
