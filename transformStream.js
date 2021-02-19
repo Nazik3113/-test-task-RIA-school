@@ -13,45 +13,36 @@ class transform extends Transform {
       splitedArr[index] = arr.split(':')
     })
 
-    let indexArr = 0
-
-    splitedArr.forEach((arr) => {
+    splitedArr.forEach(array => {
+      const arr = array.slice(0, -1).reverse()
       if (arr.length === 1) {
-        indexArr = 0
+        groups.set(arr.shift().trim(), {message: `${array[0]}: ${array[array.length - 1].trim()}`, comments: new Map()})
       } else {
-        if (indexArr === 0) {
-          groups.set(arr[0].trim(), `${arr[0]}: ${arr[1].trim()} \n`)
-          indexArr++
-        } else {
-          let count = 0
-
-          for (let i = 0; i < arr.length; i++) {
-            if (arr.length === 2) {
-              groups.set(arr[0].trim(), `${arr[0]}: ${arr[1].trim()} \n`)
-            }
-            if (arr.length > 2 && indexArr !== 0 && count === 0) {
-              groups.set(
-                arr[arr.length - 2],
-                `${groups.get(arr[arr.length - 2])}${' '.repeat(
-                  (arr.length - 1) * 2 - 2
-                )}|- ${arr[0].trim()}: ${arr[arr.length - 1].trim()} \n`
-              )
-              count++
-            }
-            if (i === arr.length - 1) {
-              count = 0
-            }
+        (function setComment(map, space) {
+          if (arr.length === 1) {
+            map.set(arr.shift().trim(), {message: `${space}|-${array[0]}: ${array[array.length - 1].trim()}`, comments: new Map()})
+          } else {
+            setComment(map.get(arr.shift()).comments, ' '.repeat((array.length - 1) * 2 - 2))
           }
-        }
+        })(groups.get(arr.shift()).comments, '  ')
       }
     })
 
     let string = ''
-    for (var value of groups.values()) {
-      string += value
-    }
-    console.log(groups);
 
+    function setString(map) {
+      for (var [key, value] of map) {
+        if (map.get(key).comments.size === 0) {
+          string += `${map.get(key).message}\n`
+        } else {
+          string += `${map.get(key).message}\n`
+          setString(map.get(key).comments)
+        }
+      } 
+    }
+    setString(groups)
+
+    
     this.push(string)
     done()
   }
